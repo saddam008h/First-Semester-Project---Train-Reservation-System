@@ -9,4 +9,4 @@ pip install pymongo
 now run the python file
 
 ### Screen Shots
-!(/Screenshot%202023-01-18%20215430.png)
+![/Screenshot%202023-01-18%20215430.png](https://github.com/SHnice/First-Semester-Project---Train-Reservation-System/blob/main/Screenshot%202023-01-18%20215430.png)
