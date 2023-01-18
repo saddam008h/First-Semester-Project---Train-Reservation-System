@@ -1,0 +1,575 @@
+import sys
+from PyQt5 import QtGui, QtWidgets, uic, QtCore
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from datetime import date, datetime, timedelta
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+
+############## USING MONGO_DB DATA BASE####################
+url = "mongodb+srv://arsal0344:arsal@cluster0.u6h8hwf.mongodb.net/?retryWrites=true&w=majority"
+client = MongoClient(url)
+
+dbname = client['saddamDB']
+bookingCollection = dbname["bookings"]
+userCollection = dbname["sign up details"]
+
+##############################  List Of Trains ###################################
+All_trains = [{'id': 'T-501', 'departure city': 'Karachi', 'destination city': 'Quetta', 'departure time': '01:00',
+               'arrival time': '13:00', 'fare': '1200'},
+              {'id': 'T-502', 'departure city': 'Karachi', 'destination city': 'Quetta', 'departure time': '12:00',
+               'arrival time': '23:00', 'fare': '1200'},
+              {'id': 'T-501', 'departure city': 'Quetta', 'destination city': 'Karachi', 'departure time': '13:00',
+               'arrival time': '01:00', 'fare': '2000'},
+              {'id': 'T-502', 'departure city': 'Quetta', 'destination city': 'Karachi', 'departure time': '23:00',
+               'arrival time': '12:00', 'fare': '2000'},
+              {'id': 'T-503', 'departure city': 'Karachi', 'destination city': 'Islamabad', 'departure time': '08:00',
+               'arrival time': '20:00', 'fare': '1000'},
+              {'id': 'T-504', 'departure city': 'Karachi', 'destination city': 'Islamabad', 'departure time': '20:00',
+               'arrival time': '08:00', 'fare': '1000'},
+              {'id': 'T-503', 'departure city': 'Islamabad', 'destination city': 'Karachi', 'departure time': '20:00',
+               'arrival time': '08:00', 'fare': '1300'},
+              {'id': 'T-504', 'departure city': 'Islamabad', 'destination city': 'Karachi', 'departure time': '08:00',
+               'arrival time': '20:00', 'fare': '1300'},
+              {'id': 'T-505', 'departure city': 'Karachi', 'destination city': 'Peshawar', 'departure time': '07:00',
+               'arrival time': '19:00', 'fare': '800'},
+              {'id': 'T-506', 'departure city': 'Karachi', 'destination city': 'Peshawar', 'departure time': '19:00',
+               'arrival time': '07:00', 'fare': '800'},
+              {'id': 'T-505', 'departure city': 'Peshawar', 'destination city': 'Karachi', 'departure time': '19:00',
+               'arrival time': '07:00', 'fare': '1400'},
+              {'id': 'T-506', 'departure city': 'Peshawar', 'destination city': 'Karachi', 'departure time': '07:00',
+               'arrival time': '19:00', 'fare': '1400'},
+              {'id': 'T-507', 'departure city': 'Quetta', 'destination city': 'Islamabad', 'departure time': '01:00',
+               'arrival time': '13:00', 'fare': '1200'},
+              {'id': 'T-508', 'departure city': 'Quetta', 'destination city': 'Islamabad', 'departure time': '12:00',
+               'arrival time': '23:00', 'fare': '1200'},
+              {'id': 'T-507', 'departure city': 'Islamabad', 'destination city': 'Quetta', 'departure time': '13:00',
+               'arrival time': '01:00', 'fare': '2000'},
+              {'id': 'T-508', 'departure city': 'Islamabad', 'destination city': 'Quetta', 'departure time': '23:00',
+               'arrival time': '12:00', 'fare': '2000'},
+              {'id': 'T-509', 'departure city': 'Quetta', 'destination city': 'Peshawar', 'departure time': '08:00',
+               'arrival time': '20.00', 'fare': '1000'},
+              {'id': 'T-510', 'departure city': 'Quetta', 'destination city': 'Peshawar', 'departure time': '20:00',
+               'arrival time': '08:00', 'fare': '1000'},
+              {'id': 'T-509', 'departure city': 'Peshawar', 'destination city': 'Quetta', 'departure time': '20:00',
+               'arrival time': '08:00', 'fare': '1300'},
+              {'id': 'T-510', 'departure city': 'Peshawar', 'destination city': 'Quetta', 'departure time': '08:00',
+               'arrival time': '20:00', 'fare': '1300'},
+              {'id': 'T-511', 'departure city': 'Islamabad', 'destination city': 'Peshawar', 'departure time': '07:00',
+               'arrival time': '19:00', 'fare': '800'},
+              {'id': 'T-512', 'departure city': 'Islamabad', 'destination city': 'Peshawar', 'departure time': '19:00',
+               'arrival time': '07:00', 'fare': '800'},
+              {'id': 'T-511', 'departure city': 'Peshawar', 'destination city': 'Islamabad', 'departure time': '19:00',
+               'arrival time': '07:00', 'fare': '1400'},
+              {'id': 'T-512', 'departure city': 'Peshawar', 'destination city': 'Islamabad', 'departure time': '07:00',
+               'arrival time': '19:00', 'fare': '1400'}, ]
+############################## GLOBAL VARIABLES #########################################################
+user_allbookings = []
+user_loginInfo = {}
+bookings = {}
+
+
+############################################# WELCOME SCREEN ##############################################
+class WelcomeWindow(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("C://Users//Saddam//Desktop//Train Reservation System//WelcomeWindow.ui", self)
+        self.setWindowTitle("Train Reservation System")
+        self.signinButton.clicked.connect(self.on_signinButton_click)
+        self.signupButton.clicked.connect(self.on_signupButton_click)
+
+    def on_signinButton_click(self):
+        self.new = Signin_window(self)
+        self.new.show()
+        self.close()
+
+    def on_signupButton_click(self):
+        self.new = Signup_window(self)
+        self.new.show()
+        self.close()
+
+
+############################################ SING IN SCREEN ######################################################
+class Signin_window(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__()
+        uic.loadUi("C://Users//Saddam//Desktop//Train Reservation System//SigninWindow.ui", self)
+        self.parent = parent
+        self.loginButton.clicked.connect(self.on_loginButton_click)
+
+    def on_loginButton_click(self):
+        username = self.usernameInput.text()
+        password = self.passwordInput.text()
+        if len(username) == 0 or len(password) == 0:
+            self.errorLabel.setText('Please enter all fields')
+        # Matching username and password of user with dababase
+        find_user = userCollection.find_one({"username": username, "password": password})
+        if find_user:
+            # storing user_login information because we will need it for access to his all_bookings
+            user_loginInfo['username'] = username
+            user_loginInfo["password"] = password
+            self.new = User_account(self)
+            self.new.show()
+            self.close()
+        else:
+            msg = QMessageBox()
+            msg.setText("Username or Password is not correct please try again")
+            msg.setWindowTitle("Log in")
+            msg.setStyleSheet("background-color: rgb(255, 255, 255);")
+            msg.setStyleSheet("color: rgb(0, 0, 0);")
+            msg.exec_()
+
+
+############################################### SIGN UP SCREEN #####################################################################
+class Signup_window(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__()
+        uic.loadUi("C://Users//Saddam//Desktop//Train Reservation System//SignupWindow.ui", self)
+        self.parent = parent
+        self.create_newAccountButton.clicked.connect(self.on_signupButton_click)
+        # Disabling login bottun untill all fields are not filled
+        self.usernameInput.textChanged.connect(self.checkAllFields_filled)
+        self.passwordInput.textChanged.connect(self.checkAllFields_filled)
+        self.password_conferm_Input.textChanged.connect(self.checkAllFields_filled)
+
+    def checkAllFields_filled(self):
+        username = self.usernameInput.text()
+        password = self.passwordInput.text()
+        conferm_password = self.password_conferm_Input.text()
+        if len(username) and len(password) and len(conferm_password):
+            self.create_newAccountButton.setEnabled(True)
+        else:
+            self.create_newAccountButton.setEnabled(False)
+
+    def on_signupButton_click(self):
+        username = self.usernameInput.text()
+        password = self.passwordInput.text()
+        conferm_password = self.password_conferm_Input.text()
+        if password != conferm_password:
+            self.errorLabel.setText('Both Passwords are not matched')
+            return
+        if userCollection.find_one({'username': username}):
+            self.sameusername.setText('The username is already exist')
+            self.errorLabel.setText('')
+            return
+
+        user_loginInfo["username"] = username
+        user_loginInfo["password"] = password
+        try:
+            # saving user login password and username in the data base
+            userCollection.insert_one(user_loginInfo)
+        except:
+            print('error')
+
+        msg = QMessageBox()
+        msg.setText("Your Account has been successfully created")
+        msg.setWindowTitle("Account Created")
+        msg.setStyleSheet("background-color: rgb(255, 255, 255);")
+        msg.setStyleSheet("color: rgb(0, 0, 0);")
+        msg.exec_()
+        # opening new window of booking when sign up button will clicked
+        self.new = User_account(self)
+        self.new.show()
+        self.close()
+
+
+##################################################### Book Now And My Bookings Screen ###################################
+class User_account(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__()
+        uic.loadUi("C://Users//Saddam//Desktop//Train Reservation System//BookandMybookingWindow.ui", self)
+        self.parent = parent
+        self.bookNowButton.clicked.connect(self.on_booknowButton_click)
+        self.myBookingsButton.clicked.connect(self.on_mybookingsButton_click)
+
+    def on_booknowButton_click(self):
+        global bookings
+        bookings = {}
+        self.new = PersonalinfoWindow(self)
+        self.new.show()
+
+    def on_mybookingsButton_click(self):
+        try:
+            # Extracting all user bookings from data base to my bookings window
+            global user_allbookings
+            user_allbookings = []
+            bookings = bookingCollection.find({"username": user_loginInfo["username"]})
+            for booking in bookings:
+                user_allbookings.append(booking)
+        except:
+            print('error')
+        else:
+            self.new = MybookingsWindow(self)
+            self.new.show()
+
+
+########################################################## Passenger Information Screen ######################################################3
+class PersonalinfoWindow(QtWidgets.QWidget):
+    all_departure_trains = []
+    all_destination_trains = []
+    currentBooking = {}
+    final_train = {}
+
+    def __init__(self, parent, booking={}):
+        super().__init__()
+        uic.loadUi("C://Users//Saddam//Desktop//Train Reservation System//PersonalinfoWindow.ui", self)
+        self.parent = parent
+        # getting upcoming next 10 dates
+        self.trainsTable.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignLeft)
+        UpComingdates_list = []
+        for i in range(10):
+            UpComingdates_list.append(str(date.today() + timedelta(days=i)))
+        self.departureDate.addItems(UpComingdates_list)
+        # Every time when departure city select then all available destination cities automatically insert in ComboBox
+        self.departureCity.currentTextChanged.connect(self.on_selectdeparturecity)
+        self.destinationCity.currentTextChanged.connect(self.on_destinationcity)
+        self.departureTime.currentTextChanged.connect(self.on_departuretime)
+        self.submitButton.clicked.connect(self.on_submitclick)
+        self.passengerID.setMaxLength(13)
+
+
+        # Check weither all fields are filled or not
+        self.submitButton.setEnabled(False)
+        self.passengerNameinput.textChanged.connect(self.check_allfields)
+        self.passengerID.textChanged.connect(self.check_allfields)
+        self.departureCity.currentTextChanged.connect(self.check_allfields)
+        # MAKING TABLE OF USER'S BOOKINGS
+        header = self.trainsTable.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.Stretch)
+
+        self.trainsTable.setRowCount(0)
+        # INSERTING ALL USER BOOKINGS IN TABLE
+        for table in All_trains:
+            rowPosition = self.trainsTable.rowCount()
+            self.trainsTable.insertRow(rowPosition)
+            self.trainsTable.setItem(rowPosition, 0, QTableWidgetItem(table['id']))
+            self.trainsTable.setItem(rowPosition, 1, QTableWidgetItem(table['departure city']))
+            self.trainsTable.setItem(rowPosition, 2, QTableWidgetItem(table['destination city']))
+            self.trainsTable.setItem(rowPosition, 3, QTableWidgetItem(table['departure time']))
+            self.trainsTable.setItem(rowPosition, 4, QTableWidgetItem(table['arrival time']))
+            self.trainsTable.setItem(rowPosition, 5, QTableWidgetItem(table['fare']))
+
+        ############# THIS WINDOW OPEN FROM UPDATE BUTTON ###############
+        #  If currently any booking dictionary exist in update class then following code will execute
+        # And this code will give auto filled booking form to change anything
+        if booking:
+            self.cannot.setText('Note: You Can not Update Name or CNIC number  ')
+            self.currentBooking = booking
+            self.passengerNameinput.setText(booking['passenger_name'])
+            self.passengerNameinput.setReadOnly(True)
+            self.passengerID.setText(booking['passenger_id'])
+            self.passengerID.setReadOnly(True)
+            # convert string date to QDate
+            date_str = booking['dateOfBirth']
+            qdate = QtCore.QDate.fromString(date_str, "dd-mm-yyyy")
+            self.dateOfBirth = QtWidgets.QDateEdit()
+            # Set the format of how the QDate will be displayed in the widget
+            self.dateOfBirth.setDisplayFormat("mm-dd-yyyy")
+            self.dateOfBirth.setDate(qdate)
+            self.dateOfBirth.setReadOnly(True)
+            self.seatPreference.setCurrentText(booking['preferenceOfSeat'])
+            self.departureCity.setCurrentText(booking['departure_city'])
+            self.departureDate.setCurrentText(booking['departure_date'])
+            self.destinationCity.setCurrentText(booking['destination_city'])
+            self.trainID.setText(booking['train_id'])
+
+
+    def on_selectdeparturecity(self):
+        self.all_departure_trains = []
+        self.departureTime.clear()
+        self.destinationCity.clear()
+        for train in All_trains:
+            if self.departureCity.currentText() == train["departure city"]:
+                self.all_departure_trains.append(train)
+        # GETTING ALL destination cities of departure trains
+        destinationCities = [train['destination city'] for train in self.all_departure_trains]
+        # we see in our destination City ComboBox that same city names are appeared multiple times
+        # so to see a city name only only once
+        self.DestinationCity = []
+        for city in destinationCities:
+            if city not in self.DestinationCity:
+                self.DestinationCity.append(city)
+        self.destinationCity.addItems(self.DestinationCity)
+
+    # when select destination city ( ACTUALLY WE  FILTER OUT ALL UNNECESSARY TRAINS)
+    def on_destinationcity(self):
+        self.departureTime.clear()
+        self.all_destination_trains = []
+        for i in self.all_departure_trains:
+            if self.destinationCity.currentText() == i['destination city']:
+                self.all_destination_trains.append(i)
+        for i in self.all_destination_trains:
+            self.departureTime.addItem(i['departure time'])
+        #### HERE WE GET ONLY ONE FINAL TRAIN AFTER FILTERING ALL trains
+        for i in self.all_destination_trains:
+            if self.departureTime.currentText() == i['departure time']:
+                self.final_train = i
+
+    def on_departuretime(self):
+        for i in self.all_destination_trains:
+            if self.departureTime.currentText() == i['departure time']:
+                self.final_train = i
+                self.trainID.setText(self.final_train['id'])
+
+    def check_allfields(self):
+        passenger_name = self.passengerNameinput.text()
+        passenger_id = self.passengerID.text()
+        departure_city = self.departureCity.currentText()
+        if passenger_name and passenger_id and departure_city:
+            self.submitButton.setEnabled(True)
+        else:
+            self.submitButton.setEnabled(False)
+
+    def on_submitclick(self):
+        passenger_name = self.passengerNameinput.text()
+        passenger_id = self.passengerID.text()
+        dateOfBirth = self.dateOfBirth.date()
+        preferenceOfSeat = self.seatPreference.currentText()
+        train_id = self.trainID.text()
+        departure_city = self.departureCity.currentText()
+        departure_date = self.departureDate.currentText()
+        destination_city = self.destinationCity.currentText()
+        departure_time = self.departureTime.currentText()
+        arrival_time = self.final_train['arrival time']
+        fare = self.final_train['fare']
+        ######## STORING ALL USER input DATA IN A DICTIONARY(bookings) #########
+        bookings['passenger_name'] = passenger_name
+        bookings['passenger_id'] = passenger_id
+        bookings['dateOfBirth'] = dateOfBirth.toString('dd-MM-yyyy')
+        bookings['preferenceOfSeat'] = preferenceOfSeat
+        bookings['train_id'] = train_id
+        bookings['departure_city'] = departure_city
+        bookings['departure_date'] = departure_date
+        bookings['departure_time'] = departure_time
+        bookings['destination_city'] = destination_city
+        bookings['arrival_time'] = arrival_time
+        bookings['fare'] = fare
+        bookings['username'] = user_loginInfo['username']
+
+        self.new = Review(self)
+        self.new.show()
+        self.close()
+
+
+##################################################### REVIEW SCREEN #####################################################3
+class Review(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__()
+        uic.loadUi("C://Users//Saddam//Desktop//Train Reservation System//FinalSurityWindow.ui", self)
+        self.parent = parent
+        global bookings
+        # Getting age from passenger's date of birth
+        if self.parent.currentBooking:
+            self.ticket.setText("Update")
+
+        def user_age(birthdate):
+            today = date.today()
+            age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+            return age
+
+        date_time_str = bookings['dateOfBirth']
+        datetime_obj = datetime.strptime(date_time_str, '%d-%m-%Y')
+        age = str(user_age(datetime_obj))
+        bookings['age'] = age
+        #### SHOWING ALL USER DATA ######
+        self.name.setText(bookings['passenger_name'])
+        self.id.setText(bookings['passenger_id'])
+        self.birth.setText(bookings['dateOfBirth'])
+        self.age.setText(age)
+        self.seat.setText(bookings['preferenceOfSeat'])
+        self.trainid.setText(bookings['train_id'])
+        self.departurecity.setText(bookings['departure_city'])
+        self.departuredate.setText(bookings['departure_date'])
+        self.departuretime.setText(bookings['departure_time'])
+        self.destinationcity.setText(bookings['destination_city'])
+        self.arrivaltime.setText(bookings['arrival_time'])
+        self.fare.setText(bookings['fare'])
+        # check passenger category
+        if int(age) < 2:
+            self.kid.setChecked(True)
+            payable_amount = 0
+            self.fare_2.setText(str(payable_amount))
+        if int(age) > 60:
+            self.senior.setChecked(True)
+            payable_amount = int(bookings['fare']) - int(bookings['fare']) * 0.40
+            self.fare_2.setText(str(payable_amount))
+        if int(age) >= 2 and int(age) < 18:
+            payable_amount = int(bookings['fare']) - int(bookings['fare']) * 0.20
+            self.fare_2.setText(str(payable_amount))
+            self.child.setChecked(True)
+        if int(age) >= 18 and int(age) <= 60:
+            payable_amount = int(bookings['fare'])
+            self.fare_2.setText(str(payable_amount))
+        self.senior.setEnabled(False)
+        self.kid.setEnabled(False)
+        self.young.setEnabled(False)
+        self.ticket.clicked.connect(self.on_getTicket)
+        self.cancel.clicked.connect(self.on_cancelClick)
+
+    def on_cancelClick(self):
+        self.close()
+        self.parent.close()
+        self.new = User_account(self)
+        self.new.show()
+
+    def on_getTicket(self):
+        # Showing messagebox of ticket booked
+        msg = QMessageBox()
+        msg.setText("Your Ticket has been successfuly booked,Goto My Booking for update or cancel")
+        if self.parent.currentBooking:
+            msg.setText("Your Booking has been successfuly updated")
+        msg.setWindowTitle("Ticket Booked")
+        msg.setStyleSheet("background-color: rgb(255, 255, 255);")
+        msg.setStyleSheet("color: rgb(0, 0, 0);")
+        msg.exec_()
+        ########### This is for update the dictionary of user booking or adding new booking into database ###########
+        try:
+            # if currentBooking will exist in updating window then user data will be update in the database
+            if self.parent.currentBooking:
+                specific_id = {"_id": self.parent.currentBooking["_id"]}
+                updatedBooking = {"$set": bookings}
+                bookingCollection.update_one(specific_id, updatedBooking)
+                for booking in user_allbookings:
+                    if booking["_id"] == self.parent.currentBooking["_id"]:
+                        booking = bookings
+            # if currentBooking will not exist in updating window then userdata will add in database
+            else:
+                bookingCollection.insert_one(bookings)
+        except:
+            print('erorr')
+
+        self.close()
+        self.new = User_account(self)
+        self.new.show()
+
+
+########################################################## MY BOOKINGS WINDOW #####################################################
+class MybookingsWindow(QtWidgets.QWidget):
+    currentBooking = {}
+
+    def __init__(self, parent=None):
+        super().__init__()
+        uic.loadUi("C://Users//Saddam//Desktop//Train Reservation System//UpdateWindow.ui", self)
+        self.parent = parent
+        # MAKING TABLE OF USER'S BOOKINGS
+        header = self.bookingsTable.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
+
+        self.bookingsTable.setRowCount(0)
+        # INSERTING ALL USER BOOKINGS IN TABLE
+        for booking in user_allbookings:
+            rowPosition = self.bookingsTable.rowCount()
+            self.bookingsTable.insertRow(rowPosition)
+            self.bookingsTable.setItem(rowPosition, 0, QTableWidgetItem(booking['passenger_name']))
+            self.bookingsTable.setItem(rowPosition, 1, QTableWidgetItem(booking['departure_city']))
+            self.bookingsTable.setItem(rowPosition, 2, QTableWidgetItem(booking['departure_date']))
+            self.bookingsTable.setItem(rowPosition, 3, QTableWidgetItem(booking['departure_time']))
+
+        self.bookingsTable.clicked.connect(self.on_itemClicked)
+
+    def on_itemClicked(self, item):
+        index = item.row()
+        # SELECTING A CURRENT_BOOKING FROM  ALL_BOOKINGS LIST
+        self.currentBooking = user_allbookings[index]
+        self.new = UpdateCancelWindow(self)
+        self.new.show()
+        self.close()
+
+
+############################################################### UPDATE OR DELETE BOOKING WINDOW ########################################
+class UpdateCancelWindow(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__()
+        uic.loadUi("C://Users//Saddam//Desktop//Train Reservation System//Update_Cancel_Window.ui", self)
+        self.parent = parent
+        # SHOWING ALL CURRENT_BOOKING DICTIONARY DATA ON SCREEN
+        booking = self.parent.currentBooking
+        age = booking['age']
+        self.name.setText(booking['passenger_name'])
+        self.id.setText(booking['passenger_id'])
+        self.birth.setText(booking['dateOfBirth'])
+        self.age.setText(age)
+        self.seat.setText(booking['preferenceOfSeat'])
+        self.trainid.setText(booking['train_id'])
+        self.departurecity.setText(booking['departure_city'])
+        self.departuredate.setText(booking['departure_date'])
+        self.departuretime.setText(booking['departure_time'])
+        self.destinationcity.setText(booking['destination_city'])
+        self.arrivaltime.setText(booking['arrival_time'])
+        self.fare.setText(booking['fare'])
+
+        if int(age) < 2:
+            self.kid.setChecked(True)
+            payable_amount = 0
+            self.fare_2.setText(str(payable_amount))
+            self.parent.currentBooking['payable_amount'] = payable_amount
+        if int(age) > 60:
+            self.senior.setChecked(True)
+            payable_amount = int(booking['fare']) - int(booking['fare']) * 0.40
+            self.fare_2.setText(str(payable_amount))
+            self.parent.currentBooking['payable_amount'] = payable_amount
+        if int(age) >= 2 and int(age) < 18:
+            payable_amount = int(booking['fare']) - int(booking['fare']) * 0.20
+            self.fare_2.setText(str(payable_amount))
+            self.child.setChecked(True)
+            self.parent.currentBooking['payable_amount'] = payable_amount
+        if int(age) >= 18 and int(age) <= 60:
+            payable_amount = int(booking['fare'])
+            self.fare_2.setText(str(payable_amount))
+            self.parent.currentBooking['payable_amount'] = payable_amount
+        self.senior.setEnabled(False)
+        self.kid.setEnabled(False)
+        self.young.setEnabled(False)
+
+
+        self.updateButton.clicked.connect(self.on_update_click)
+        self.deleteButton.clicked.connect(self.on_delete_click)
+
+    def on_update_click(self):
+        self.new = PersonalinfoWindow(self, self.parent.currentBooking)
+        self.new.show()
+        self.close()
+
+    def on_delete_click(self):
+        self.msg = QMessageBox()
+        self.msg.setIcon(QMessageBox.Information)
+        self.msg.setText("Are you sure to delete your booking?")
+        self.msg.setWindowTitle("Booking Deleting")
+        self.msg.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        self.msg.show()
+        self.msg.buttonClicked.connect(self.on_button_click)
+
+    def on_button_click(self, button):
+        if button.text() == '&Yes':
+            id = self.parent.currentBooking['_id']
+            bookingCollection.delete_one({'_id': id})
+            amount = self.parent.currentBooking['payable_amount']
+            refund = 0.5*amount
+            msg = QMessageBox()
+            msg.setText(f"Your Booking has been deleted, Please Collect your Refund of {refund} Rs ")
+            msg.setWindowTitle("Log in")
+            msg.setStyleSheet("background-color: rgb(255, 255, 255);")
+            msg.setStyleSheet("color: rgb(0, 0, 0);")
+            msg.exec_()
+
+
+        else:
+            self.close()
+        self.close()
+        self.new = User_account(self)
+        self.new.show()
+
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    window = WelcomeWindow()
+    window.show()
+    app.exec_()
