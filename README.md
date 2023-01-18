@@ -7,3 +7,6 @@ pip install pymongo
 
 ### Run 
 now run the python file
+
+### Screen Shots
+!(/Screenshot 2023-01-18 215430.png)
